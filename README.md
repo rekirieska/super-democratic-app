@@ -20,7 +20,6 @@ Implements authentication, role‑based access, full CRUD for subject‑domain e
 ### Registration
 - Registration form with fields: username, password, password confirmation, email, rank (subject‑specific field).
 - Password requirements: minimum 8 characters, at least one uppercase letter, one digit, and one special character.
-- Email validation using standard regex (no artificial restriction on "admin" substring – such requirement is technically incorrect and ignored as per best practices).
 - New user is saved to the database and can immediately log in.
 
 ### Role Model
