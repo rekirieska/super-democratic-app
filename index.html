@@ -1,0 +1,2281 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Программа Братской Поддержки V2.0 — Супер-Земля</title>
+        <style>
+            /* ---------- ОРИГИНАЛЬНЫЕ СТИЛИ Helldivers 2 ---------- */
+            :root {
+                --yellow-demo: #ffe710;
+                --yellow-glow: rgba(255, 231, 16, 0.3);
+                --red-alert: #a30000;
+                --red-glow: rgba(163, 0, 0, 0.5);
+                --bg-dark: #0b0c0d;
+                --panel-bg: rgba(20, 22, 24, 0.85);
+                --border-color: #34373b;
+                --text-main: #f0f0f0;
+                --text-dim: #8a8f94;
+                --input-bg: #000000cc;
+                --accent-success: #00ff2b;
+                --btn-bg: rgba(30, 33, 37, 0.6);
+                --btn-hover-bg: rgba(52, 55, 59, 0.8);
+                --btn-active-bg: rgba(255, 231, 16, 0.1);
+                --btn-active-border: var(--yellow-demo);
+            }
+            body.light-theme {
+                --yellow-demo: #fabd2f;
+                --yellow-glow: rgba(250, 189, 47, 0.2);
+                --red-alert: #cc241d;
+                --red-glow: rgba(204, 36, 29, 0.3);
+                --bg-dark: #fbf1c7;
+                --panel-bg: rgba(235, 219, 178, 0.9);
+                --border-color: #d5c4a1;
+                --text-main: #3c3836;
+                --text-dim: #7c6f64;
+                --input-bg: #f9f5d7;
+                --accent-success: #98971a;
+                --btn-bg: rgba(235, 219, 178, 0.7);
+                --btn-hover-bg: rgba(213, 196, 161, 0.9);
+                --btn-active-bg: rgba(250, 189, 47, 0.2);
+                --btn-active-border: #fabd2f;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                font-family: "Courier New", Courier, monospace;
+                text-transform: uppercase;
+                user-select: none;
+            }
+            body {
+                font-size: 12px;
+                background-color: var(--bg-dark);
+                color: var(--text-main);
+                height: 100vh;
+                width: 100vw;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .scale-container {
+                width: 100%;
+                height: 100%;
+                zoom: 1;
+                transition: zoom 0.1s ease;
+            }
+            input,
+            textarea,
+            button {
+                text-transform: none;
+            }
+            body::before {
+                content: " ";
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                background:
+                    linear-gradient(
+                        rgba(18, 16, 16, 0) 50%,
+                        rgba(0, 0, 0, 0.25) 50%
+                    ),
+                    linear-gradient(
+                        90deg,
+                        rgba(255, 0, 0, 0.06),
+                        rgba(0, 255, 0, 0.02),
+                        rgba(0, 0, 255, 0.06)
+                    );
+                z-index: 999;
+                background-size:
+                    100% 4px,
+                    6px 100%;
+                pointer-events: none;
+            }
+            body.light-theme::before {
+                display: none;
+            }
+            #auth-container,
+            #app-container {
+                width: 100%;
+                height: 100%;
+                background-color: #111417;
+                border: 4px solid var(--border-color);
+                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                padding: 10px;
+                overflow-y: auto;
+            }
+            body.light-theme #auth-container,
+            body.light-theme #app-container {
+                background-color: #fbf1c7dd;
+            }
+            #app-container {
+                display: none;
+            }
+            header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 2px solid var(--yellow-demo);
+                padding-bottom: 8px;
+                margin-bottom: 10px;
+                flex-wrap: wrap;
+            }
+            .logo-area {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .logo-svg {
+                width: 40px;
+                height: 40px;
+                fill: var(--yellow-demo);
+                filter: drop-shadow(0 0 5px var(--yellow-glow));
+            }
+            .super-earth-title {
+                font-size: 1.4rem;
+                font-weight: bold;
+                color: var(--text-main);
+                letter-spacing: 2px;
+            }
+            .program-info {
+                text-align: right;
+            }
+            .program-info h1 {
+                font-size: 0.9rem;
+                color: var(--yellow-demo);
+                letter-spacing: 1px;
+            }
+            .program-info span {
+                font-size: 0.7rem;
+                color: var(--text-dim);
+            }
+            nav {
+                display: flex;
+                gap: 5px;
+                border-top: 1px solid var(--border-color);
+                padding-top: 8px;
+                margin-top: 8px;
+                flex-wrap: wrap;
+            }
+            .nav-btn {
+                flex: 1;
+                background-color: var(--btn-bg);
+                border: 1px solid var(--border-color);
+                color: var(--text-dim);
+                padding: 8px;
+                font-size: 0.8rem;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .nav-btn:hover {
+                background-color: var(--btn-hover-bg);
+                color: var(--text-main);
+            }
+            .nav-btn.active {
+                background-color: var(--btn-active-bg);
+                border: 1px solid var(--btn-active-border);
+                color: var(--yellow-demo);
+                font-weight: bold;
+                box-shadow: inset 0 0 5px var(--yellow-glow);
+            }
+            .screen {
+                display: none;
+                flex-direction: column;
+                flex-grow: 1;
+                justify-content: space-between;
+            }
+            .screen.active {
+                display: flex;
+            }
+            .user-panel {
+                display: flex;
+                justify-content: space-between;
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 8px 16px;
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+            }
+            .status-active {
+                color: var(--yellow-demo);
+                font-weight: bold;
+            }
+            .efficiency-container {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            .efficiency-title {
+                font-size: 0.8rem;
+                color: var(--text-dim);
+                margin-bottom: 6px;
+                text-align: center;
+            }
+            .progress-bar-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .progress-bar-outer {
+                flex-grow: 1;
+                height: 20px;
+                border: 1px solid var(--yellow-demo);
+                background-color: rgba(0, 0, 0, 0.5);
+                padding: 2px;
+            }
+            .progress-bar-inner {
+                height: 100%;
+                background-color: var(--yellow-demo);
+                box-shadow: 0 0 8px var(--yellow-glow);
+                transition: width 0.3s ease;
+            }
+            .progress-percent {
+                font-size: 0.9rem;
+                color: var(--yellow-demo);
+                font-weight: bold;
+                width: 40px;
+                text-align: right;
+            }
+            .directives-container {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                flex-grow: 1;
+                overflow-y: auto;
+                margin-bottom: 15px;
+                min-height: 200px;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .directives-title {
+                font-size: 0.85rem;
+                color: var(--yellow-demo);
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+                width: 100%;
+            }
+            .task-item {
+                display: flex;
+                align-items: center;
+                padding: 6px 0;
+                border-bottom: 1px dashed rgba(138, 143, 148, 0.2);
+                font-size: 0.8rem;
+                width: 100%;
+            }
+            .task-checkbox {
+                margin-right: 12px;
+                cursor: pointer;
+                width: 16px;
+                height: 16px;
+                accent-color: var(--yellow-demo);
+            }
+            .task-text {
+                flex-grow: 1;
+                cursor: pointer;
+            }
+            .task-text:hover {
+                color: var(--yellow-demo);
+            }
+            .task-item.checked .task-text {
+                color: var(--text-dim);
+                text-decoration: line-through;
+                cursor: default;
+            }
+            .task-status-counter {
+                color: var(--yellow-demo);
+                font-weight: bold;
+            }
+            .cta-button {
+                background-color: var(--red-alert);
+                color: white;
+                border: 1px solid #ff4545;
+                padding: 14px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+                letter-spacing: 1px;
+                box-shadow: 0 0 10px var(--red-glow);
+                transition: background 0.2s;
+                margin-bottom: 12px;
+            }
+            .cta-button:hover {
+                background-color: #bd0000;
+                box-shadow: 0 0 15px rgba(255, 69, 69, 0.7);
+            }
+            body.light-theme .cta-button {
+                background-color: #cc241d;
+                color: #fbf1c7;
+            }
+            .generic-panel {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 16px;
+                flex-grow: 1;
+                margin-bottom: 15px;
+                overflow-x: auto;
+                overflow-y: auto;
+            }
+            .panel-heading {
+                color: var(--yellow-demo);
+                font-size: 0.9rem;
+                margin-bottom: 12px;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            .stat-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.8rem;
+                padding: 8px 0;
+                border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+                align-items: center;
+            }
+            body.light-theme .stat-row {
+                border-bottom-color: #d5c4a1;
+            }
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.75rem;
+                margin-top: 12px;
+            }
+            .data-table th,
+            .data-table td {
+                border: 1px solid var(--border-color);
+                padding: 8px;
+                text-align: left;
+            }
+            .data-table th {
+                background-color: rgba(255, 231, 16, 0.1);
+                color: var(--yellow-demo);
+            }
+            .btn-icon {
+                background: none;
+                border: none;
+                color: var(--yellow-demo);
+                cursor: pointer;
+                margin: 0 4px;
+                font-size: 1rem;
+            }
+            .btn-icon:hover {
+                color: white;
+            }
+            body.light-theme .btn-icon:hover {
+                color: #3c3836;
+            }
+            .search-box {
+                background: var(--input-bg);
+                border: 1px solid var(--border-color);
+                color: var(--yellow-demo);
+                padding: 6px;
+                margin: 8px 0;
+                width: 220px;
+            }
+            body.light-theme .search-box {
+                color: #3c3836;
+            }
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 2000;
+                justify-content: center;
+                align-items: center;
+            }
+            .modal-overlay.active {
+                display: flex;
+            }
+            .modal-content {
+                background-color: #15181b;
+                border: 2px solid var(--red-alert);
+                padding: 20px;
+                width: 500px;
+                max-width: 90%;
+                text-align: center;
+            }
+            body.light-theme .modal-content {
+                background-color: #fbf1c7;
+                border-color: #cc241d;
+            }
+            .modal-title {
+                color: #ff4545;
+                font-size: 1rem;
+                font-weight: bold;
+                margin-bottom: 16px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+                text-align: left;
+            }
+            .form-group label {
+                display: block;
+                font-size: 0.75rem;
+                color: var(--text-dim);
+                margin-bottom: 5px;
+            }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                background: var(--input-bg);
+                border: 1px solid var(--border-color);
+                color: var(--yellow-demo);
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+            .error-msg {
+                color: #ff4545;
+                font-size: 0.7rem;
+                margin-top: 4px;
+            }
+            .btn-modal {
+                padding: 8px 16px;
+                margin-right: 10px;
+                cursor: pointer;
+                background: #24272b;
+                border: 1px solid var(--border-color);
+                color: white;
+            }
+            .btn-modal-confirm {
+                background: var(--red-alert);
+                border-color: #ff4545;
+            }
+            body.light-theme .btn-modal {
+                background: #ebdbb2;
+                color: #3c3836;
+            }
+            .auth-box {
+                background: rgba(10, 12, 18, 0.95);
+                border: 2px solid var(--yellow-demo);
+                box-shadow:
+                    0 0 20px rgba(255, 231, 16, 0.2),
+                    inset 0 0 10px rgba(0, 0, 0, 0.5);
+                padding: 30px 25px;
+                width: 480px;
+                margin: auto;
+                text-align: center;
+            }
+            body.light-theme .auth-box {
+                background: #fbf1c7ee;
+                box-shadow: 0 0 20px rgba(250, 189, 47, 0.2);
+            }
+            .auth-box h3 {
+                font-size: 1.4rem;
+                letter-spacing: 3px;
+                margin-bottom: 25px;
+                text-shadow: 0 0 5px var(--yellow-glow);
+            }
+            .auth-box input {
+                background: #000000cc;
+                border: 1px solid var(--border-color);
+                padding: 12px 14px;
+                font-size: 0.9rem;
+                color: var(--yellow-demo);
+                margin-bottom: 15px;
+                width: 100%;
+                text-align: center;
+            }
+            body.light-theme .auth-box input {
+                background: white;
+                color: #3c3836;
+            }
+            .auth-switch {
+                color: var(--yellow-demo);
+                cursor: pointer;
+                margin-top: 18px;
+                display: inline-block;
+                font-size: 0.8rem;
+                text-decoration: underline;
+            }
+            .btn-submit-task {
+                background-color: rgba(255, 231, 16, 0.15);
+                border: 1px solid var(--yellow-demo);
+                color: var(--yellow-demo);
+                padding: 12px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.2s;
+                width: 100%;
+                margin-top: 10px;
+            }
+            body.light-theme .btn-submit-task {
+                background-color: rgba(250, 189, 47, 0.2);
+                color: #3c3836;
+            }
+            .export-btn {
+                background-color: rgba(255, 231, 16, 0.2);
+                border: 1px solid var(--yellow-demo);
+                color: var(--yellow-demo);
+                padding: 6px 12px;
+                font-size: 0.7rem;
+                cursor: pointer;
+                margin-left: 12px;
+            }
+            body.light-theme .export-btn {
+                background-color: rgba(250, 189, 47, 0.2);
+                color: #3c3836;
+            }
+            .mission-header {
+                background-color: rgba(255, 231, 16, 0.05);
+                border: 1px solid var(--yellow-demo);
+                padding: 10px;
+                text-align: center;
+                font-size: 1rem;
+                color: var(--yellow-demo);
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+            .timer-box {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 40px;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .timer-title {
+                font-size: 0.8rem;
+                color: var(--text-dim);
+                margin-bottom: 12px;
+            }
+            .timer-digits {
+                font-size: 3.5rem;
+                font-weight: bold;
+                color: white;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+                letter-spacing: 2px;
+            }
+            .monitor-status {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                font-size: 0.75rem;
+                margin-bottom: 20px;
+                line-height: 1.6;
+            }
+            .status-indicator {
+                color: var(--accent-success);
+                font-weight: bold;
+            }
+            .action-buttons-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            .btn-action-success {
+                background-color: rgba(0, 150, 40, 0.3);
+                border: 1px solid var(--accent-success);
+                color: var(--accent-success);
+                padding: 14px;
+                font-size: 0.85rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+            }
+            .btn-action-fail {
+                background-color: rgba(163, 0, 0, 0.2);
+                border: 1px solid var(--red-alert);
+                color: #ff4545;
+                padding: 14px;
+                font-size: 0.85rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+            }
+            .alarm-header {
+                background-color: var(--red-alert);
+                color: white;
+                border: 1px solid #ff4545;
+                padding: 10px;
+                text-align: center;
+                font-size: 0.85rem;
+                font-weight: bold;
+                animation: pulse 1.5s infinite;
+            }
+            @keyframes pulse {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.6;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+            .alarm-body {
+                background-color: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                padding: 20px;
+                text-align: center;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 18px;
+            }
+            .alarm-icon-wrapper svg {
+                width: 70px;
+                height: 70px;
+                fill: var(--red-alert);
+                filter: drop-shadow(0 0 8px var(--red-glow));
+            }
+            .alarm-text-critical {
+                color: #ff4545;
+                font-size: 0.9rem;
+                font-weight: bold;
+            }
+            .alarm-desc {
+                font-size: 0.75rem;
+                color: var(--text-dim);
+                max-width: 600px;
+                line-height: 1.5;
+            }
+            .manual-input-box {
+                width: 100%;
+                max-width: 550px;
+                display: flex;
+                gap: 8px;
+            }
+            .manual-input {
+                flex-grow: 1;
+                background-color: black;
+                border: 1px solid var(--border-color);
+                color: var(--yellow-demo);
+                padding: 10px;
+                font-size: 0.8rem;
+                outline: none;
+            }
+            .btn-hq-task {
+                background-color: var(--yellow-demo);
+                color: black;
+                border: 1px solid var(--yellow-demo);
+                padding: 14px;
+                font-size: 0.85rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .scale-slider {
+                width: 180px;
+                margin-left: 15px;
+                -webkit-appearance: none;
+                background: #2a2d32;
+                height: 6px;
+                border-radius: 3px;
+                outline: none;
+            }
+            body.light-theme .scale-slider {
+                background: #d5c4a1;
+            }
+            .scale-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 0;
+                background: var(--yellow-demo);
+                cursor: pointer;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 0 5px var(--yellow-glow);
+            }
+            .scale-slider::-moz-range-thumb {
+                -moz-appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 0;
+                background: var(--yellow-demo);
+                cursor: pointer;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 0 5px var(--yellow-glow);
+            }
+            .motivation-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.85);
+                z-index: 3000;
+                justify-content: center;
+                align-items: center;
+            }
+            .motivation-modal.active {
+                display: flex;
+            }
+            .motivation-modal .modal-content {
+                background-color: #15181b;
+                border: 2px solid var(--red-alert);
+                padding: 20px;
+                width: 450px;
+                text-align: center;
+                box-shadow: 0 0 25px var(--red-glow);
+            }
+            body.light-theme .motivation-modal .modal-content {
+                background-color: #fbf1c7;
+            }
+            .motivation-modal .modal-title {
+                color: #ff4545;
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 12px;
+            }
+            .motivation-modal .modal-text {
+                font-size: 11px;
+                line-height: 1.5;
+                margin-bottom: 15px;
+                color: var(--text-main);
+            }
+            .motivation-modal .modal-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+            }
+            .motivation-modal .btn-modal {
+                padding: 8px 16px;
+                font-size: 11px;
+                font-weight: bold;
+                cursor: pointer;
+                border: 1px solid var(--border-color);
+            }
+            .motivation-modal .btn-modal-confirm {
+                background-color: var(--red-alert);
+                color: white;
+                border-color: #ff4545;
+            }
+            #alert-modal .modal-text {
+                margin-bottom: 20px;
+            }
+            .alert-modal .modal-content {
+                background-color: #15181b;
+                border: 2px solid var(--red-alert);
+                padding: 20px;
+                width: 450px;
+                text-align: center;
+                box-shadow: 0 0 25px var(--red-glow);
+            }
+            body.light-theme .alert-modal .modal-content {
+                background-color: #fbf1c7;
+                border-color: #cc241d;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="scale-container" id="scale-container">
+            <div id="auth-container">
+                <div
+                    style="
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100%;
+                    "
+                >
+                    <div class="auth-box" id="login-box">
+                        <div
+                            class="logo-area"
+                            style="justify-content: center; margin-bottom: 15px"
+                        >
+                            <svg
+                                class="logo-svg"
+                                viewBox="0 0 100 100"
+                                width="50"
+                                height="50"
+                            >
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="35"
+                                    fill="none"
+                                    stroke="#ffe710"
+                                    stroke-width="1.5"
+                                />
+                                <circle
+                                    cx="50"
+                                    cy="50"
+                                    r="28"
+                                    fill="none"
+                                    stroke="#ffe710"
+                                    stroke-width="1"
+                                    stroke-dasharray="4,4"
+                                />
+                                <path
+                                    d="M 35 40 Q 40 30 50 35 Q 60 40 55 55 Q 45 65 35 55 Z"
+                                    fill="rgba(255,231,16,0.3)"
+                                    stroke="#ffe710"
+                                    stroke-width="1"
+                                />
+                                <path
+                                    d="M 60 45 Q 70 40 73 50 Q 70 65 62 60 Z"
+                                    fill="rgba(255,231,16,0.3)"
+                                    stroke="#ffe710"
+                                    stroke-width="1"
+                                />
+                                <path
+                                    d="M 45 68 Q 50 75 55 72 Q 52 65 45 68 Z"
+                                    fill="rgba(255,231,16,0.3)"
+                                    stroke="#ffe710"
+                                    stroke-width="1"
+                                />
+                                <polygon
+                                    points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11"
+                                    fill="#ffe710"
+                                />
+                            </svg>
+                            <div class="super-earth-title">СУПЕР ЗЕМЛЯ</div>
+                        </div>
+                        <h3>ВХОД В СИСТЕМУ</h3>
+                        <input
+                            type="text"
+                            id="login-username"
+                            placeholder="ЛОГИН"
+                            autocomplete="off"
+                        />
+                        <input
+                            type="password"
+                            id="login-password"
+                            placeholder="ПАРОЛЬ"
+                        />
+                        <div id="login-error" class="error-msg"></div>
+                        <button class="btn-submit-task" id="login-btn">
+                            ВОЙТИ
+                        </button>
+                        <div class="auth-switch" id="show-register">
+                            НЕТ АККАУНТА? РЕГИСТРАЦИЯ
+                        </div>
+                    </div>
+                    <div
+                        class="auth-box"
+                        id="register-box"
+                        style="display: none"
+                    >
+                        <div
+                            class="logo-area"
+                            style="justify-content: center; margin-bottom: 15px"
+                        >
+                            <svg
+                                class="logo-svg"
+                                viewBox="0 0 100 100"
+                                width="50"
+                                height="50"
+                            >
+                                ...
+                            </svg>
+                            <div class="super-earth-title">СУПЕР ЗЕМЛЯ</div>
+                        </div>
+                        <h3>РЕГИСТРАЦИЯ ГРАЖДАНИНА</h3>
+                        <input
+                            type="text"
+                            id="reg-username"
+                            placeholder="ЛОГИН"
+                            autocomplete="off"
+                        />
+                        <input
+                            type="email"
+                            id="reg-email"
+                            placeholder="EMAIL"
+                            autocomplete="off"
+                        />
+                        <input
+                            type="password"
+                            id="reg-password"
+                            placeholder="ПАРОЛЬ (мин. 8, заглавная, цифра, спецсимвол)"
+                        />
+                        <input
+                            type="password"
+                            id="reg-confirm"
+                            placeholder="ПОДТВЕРДИТЕ ПАРОЛЬ"
+                        />
+                        <input
+                            type="text"
+                            id="reg-rank"
+                            placeholder="ЗВАНИЕ (напр. Новобранец)"
+                        />
+                        <div id="reg-error" class="error-msg"></div>
+                        <button class="btn-submit-task" id="register-btn">
+                            ЗАРЕГИСТРИРОВАТЬСЯ
+                        </button>
+                        <div class="auth-switch" id="show-login">
+                            УЖЕ ЕСТЬ АККАУНТ? ВОЙТИ
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="app-container">
+                <header>
+                    <div class="logo-area">
+                        <svg class="logo-svg" viewBox="0 0 100 100">...</svg>
+                        <div class="super-earth-title">СУПЕР ЗЕМЛЯ</div>
+                    </div>
+                    <div class="program-info">
+                        <h1>Программа братской поддержки</h1>
+                        <span>v2.0 — Управляемая Демократия</span>
+                    </div>
+                </header>
+                <div
+                    id="user-greeting"
+                    style="
+                        background: rgba(0, 0, 0, 0.5);
+                        padding: 6px 10px;
+                        margin-bottom: 12px;
+                    "
+                >
+                    ДОБРО ПОЖАЛОВАТЬ, ГРАЖДАНИН
+                </div>
+                <nav id="main-nav"></nav>
+
+                <div id="dashboard-screen" class="screen active">
+                    <div>
+                        <div class="user-panel">
+                            <div>
+                                Гражданин:
+                                <span id="dashboard-username">№451-Б</span>
+                            </div>
+                            <div>
+                                Статус лояльности:
+                                <span
+                                    id="user-status-text"
+                                    class="status-active"
+                                    >В СТРОЮ</span
+                                >
+                            </div>
+                        </div>
+                        <div class="efficiency-container">
+                            <div class="efficiency-title">
+                                Текущий уровень демократической эффективности
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-outer">
+                                    <div
+                                        id="efficiency-progress"
+                                        class="progress-bar-inner"
+                                    ></div>
+                                </div>
+                                <div
+                                    id="efficiency-value"
+                                    class="progress-percent"
+                                >
+                                    65%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="directives-container">
+                            <div class="directives-title">
+                                Дневные директивы во имя свободы
+                            </div>
+                            <div id="tasks-list"></div>
+                        </div>
+                    </div>
+                    <div class="cta-button" id="motivation-btn">
+                        ЗАПРОСИТЬ ДЕМОКРАТИЧЕСКУЮ МОТИВАЦИЮ
+                    </div>
+                </div>
+
+                <div id="tasks-screen" class="screen">
+                    <div class="generic-panel">
+                        <div class="panel-heading">
+                            Управление задачами граждан<button
+                                class="export-btn"
+                                id="export-tasks-btn"
+                            >
+                                ЭКСПОРТ CSV
+                            </button>
+                        </div>
+                        <button
+                            class="btn-submit-task"
+                            id="add-task-btn"
+                            style="
+                                width: auto;
+                                padding: 6px 12px;
+                                margin-bottom: 8px;
+                            "
+                        >
+                            + ДОБАВИТЬ ЗАДАЧУ
+                        </button>
+                        <input
+                            type="text"
+                            id="task-search"
+                            placeholder="ПОИСК ПО НАЗВАНИЮ"
+                            class="search-box"
+                        />
+                        <table class="data-table" id="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Описание</th>
+                                    <th>Приоритет</th>
+                                    <th>Дедлайн</th>
+                                    <th>Пользователь</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="stats-screen" class="screen">
+                    <div class="generic-panel">
+                        <div class="panel-heading">Статистический сектор</div>
+                        <div class="stat-row">
+                            <span>Выполнено задач:</span
+                            ><span id="stat-tasks-done">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Индекс продуктивности:</span
+                            ><span id="stat-productivity">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="users-screen" class="screen">
+                    <div class="generic-panel">
+                        <div class="panel-heading">Управление гражданами</div>
+                        <table class="data-table" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Логин</th>
+                                    <th>Email</th>
+                                    <th>Звание</th>
+                                    <th>Роль</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="settings-screen" class="screen">
+                    <div class="generic-panel">
+                        <div class="panel-heading">Параметры терминала</div>
+                        <div class="stat-row">
+                            <span>Светлая тема (Gruvbox):</span
+                            ><label
+                                ><input
+                                    type="checkbox"
+                                    id="light-theme-toggle"
+                                />
+                                Активировать</label
+                            >
+                        </div>
+                        <div class="stat-row">
+                            <span>Масштаб интерфейса:</span
+                            ><input
+                                type="range"
+                                id="scale-slider"
+                                min="80"
+                                max="200"
+                                step="5"
+                                value="150"
+                                class="scale-slider"
+                            />
+                        </div>
+                        <div class="stat-row">
+                            <span>Роль в системе:</span
+                            ><span id="user-role-display">ГРАЖДАНИН</span>
+                        </div>
+                        <div class="stat-row">
+                            <button
+                                id="logout-btn"
+                                class="btn-submit-task"
+                                style="background: var(--red-alert)"
+                            >
+                                ВЫЙТИ ИЗ СИСТЕМЫ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="action-screen" class="screen">
+                    <div>
+                        <div id="active-mission-title" class="mission-header">
+                            МИССИЯ:
+                        </div>
+                        <div class="timer-box">
+                            <div class="timer-title">
+                                Осталось времени до прибытия Офицера Демократии
+                            </div>
+                            <div id="countdown-timer" class="timer-digits">
+                                00:00
+                            </div>
+                        </div>
+                        <div class="monitor-status">
+                            <div>
+                                Текущий режим:
+                                <span class="status-indicator"
+                                    >Фоновый анализ активности [АКТИВЕН]</span
+                                >
+                            </div>
+                            <div>
+                                Энергосбережение терминала:
+                                <span style="color: var(--yellow-demo)"
+                                    >Оптимальное</span
+                                >
+                            </div>
+                            <div
+                                id="tactical-log"
+                                style="
+                                    color: var(--text-dim);
+                                    margin-top: 4px;
+                                    font-size: 0.7rem;
+                                "
+                            >
+                                Лог: Телеметрия стабильна...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="action-buttons-group">
+                        <div class="btn-action-success" id="complete-task-btn">
+                            [ ДОЛОЖИТЬ О ВЫПОЛНЕНИИ ГРАЖДАНСКОГО ДОЛГА ]
+                        </div>
+                        <div class="btn-action-fail" id="fail-task-btn">
+                            [ ТРЕБУЕТСЯ КОРРЕКЦИЯ КУРСА (ПРИЗНАТЬ ЛЕНЬ) ]
+                        </div>
+                    </div>
+                </div>
+
+                <div id="alarm-screen" class="screen">
+                    <div class="alarm-header">
+                        ВНИМАНИЕ: ОБНАРУЖЕНА УГРОЗА ДЕСТРУКТИВНОЙ ПРАЗДНОСТИ!
+                    </div>
+                    <div class="alarm-body">
+                        <div class="alarm-icon-wrapper">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2L1 21h22L12 2zm0 4l7.5 13h-15L12 6zm-1 2v6h2V8h-2zm0 8v2h2v-2h-2z"
+                                />
+                            </svg>
+                        </div>
+                        <div class="alarm-text-critical">
+                            КРИТИЧЕСКАЯ ОШИБКА: Обнаружено опасное падение
+                            продуктивности
+                        </div>
+                        <div class="alarm-desc">
+                            Отсутствие запланированной или выполняемой
+                            общественно полезной активности является латентной
+                            формой саботажа. Введите задачу вручную или
+                            запросите предписание.
+                        </div>
+                        <div class="manual-input-box">
+                            <input
+                                type="text"
+                                id="task-raw-input"
+                                class="manual-input"
+                                placeholder="Введите гражданскую задачу..."
+                            /><button
+                                class="btn-submit-task"
+                                id="submit-manual-task"
+                            >
+                                В СТРОЙ
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn-hq-task" id="request-hq-task">
+                        ЗАПРОСИТЬ СЛУЧАЙНУЮ БОЕВУЮ ЗАДАЧУ ИЗ ШТАБА
+                    </button>
+                </div>
+            </div>
+
+            <div id="entity-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-title" id="modal-title">
+                        Редактирование
+                    </div>
+                    <div id="modal-body"></div>
+                    <div class="modal-buttons">
+                        <button
+                            class="btn-modal btn-modal-cancel"
+                            id="modal-cancel"
+                        >
+                            ОТМЕНА</button
+                        ><button
+                            class="btn-modal btn-modal-confirm"
+                            id="modal-confirm"
+                        >
+                            СОХРАНИТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="confirm-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-title">ПОДТВЕРЖДЕНИЕ</div>
+                    <div id="confirm-text"></div>
+                    <div class="modal-buttons">
+                        <button
+                            class="btn-modal btn-modal-cancel"
+                            id="confirm-no"
+                        >
+                            НЕТ</button
+                        ><button
+                            class="btn-modal btn-modal-confirm"
+                            id="confirm-yes"
+                        >
+                            ДА
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="motivation-modal" class="motivation-modal">
+                <div class="modal-content">
+                    <div class="modal-title">ВЫЗОВ ОФИЦЕРА ДЕМОКРАТИИ</div>
+                    <div class="modal-text">
+                        Внимание! Вы запрашиваете пакет экстренной
+                        психологической и идеологической мотивации. К вашим
+                        текущим координатам будет направлен Офицер Демократии
+                        для проведения дружеского стабилизационного диалога.
+                        Подтвердить отправку сигнала?
+                    </div>
+                    <div class="modal-buttons">
+                        <button
+                            class="btn-modal btn-modal-confirm"
+                            id="motivation-confirm"
+                        >
+                            ПОДТВЕРДИТЬ СИГНАЛ</button
+                        ><button
+                            class="btn-modal btn-modal-cancel"
+                            id="motivation-cancel"
+                        >
+                            ОТМЕНА
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="alert-modal" class="modal-overlay alert-modal">
+                <div class="modal-content">
+                    <div class="modal-title" id="alert-title">СООБЩЕНИЕ</div>
+                    <div
+                        id="alert-text"
+                        class="modal-text"
+                        style="margin-bottom: 20px"
+                    ></div>
+                    <div class="modal-buttons">
+                        <button
+                            class="btn-modal btn-modal-confirm"
+                            id="alert-ok"
+                        >
+                            ПРИНЯТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentUser = null;
+            let allTasks = [],
+                allUsers = [];
+            let currentEditing = null;
+            let loginAttempts = 0,
+                loginBlockedUntil = null,
+                blockInterval = null;
+            let globalTimerInterval = null,
+                currentRunningTask = null,
+                timerSeconds = 2700;
+            let deadlineCheckInterval = null;
+
+            const DAILY_TASKS_POOL = [
+                "Прослушать утренний гимн Супер-Земли и сделать физическую разминку",
+                "Написать благодарственное письмо Офицеру Демократии за защиту свободы",
+                "Убрать рабочее место в соответствии с нормами демократической гигиены",
+                "Проверить исправность бытовых приборов и доложить в жилищный сектор",
+                "Изучить три новых правила Управляемой Демократии из еженедельного бюллетеня",
+                "Составить список добровольных пожертвований на оборону Супер-Земли",
+                "Провести вежливую беседу с соседом о важности своевременной уплаты патриотического налога",
+                "Организовать домашний склад стратегических запасов (консервы, вода)",
+                "Пройти краткий опрос лояльности в приложении Министерства Истины",
+                "Сделать фото своего патриотического уголка и отправить в чат сектора",
+            ];
+
+            let pendingDelete = null; // для устранения накопления обработчиков
+
+            function showStyledAlert(title, message) {
+                const alertModal = document.getElementById("alert-modal");
+                document.getElementById("alert-title").innerText = title;
+                document.getElementById("alert-text").innerHTML = message;
+                alertModal.classList.add("active");
+                const okBtn = document.getElementById("alert-ok");
+                const closeHandler = () => {
+                    alertModal.classList.remove("active");
+                    okBtn.removeEventListener("click", closeHandler);
+                };
+                okBtn.onclick = closeHandler;
+            }
+
+            function isEvening() {
+                const hour = new Date().getHours();
+                return hour >= 18;
+            }
+            function isMorning() {
+                const hour = new Date().getHours();
+                return hour >= 6 && hour < 18;
+            }
+
+            async function autoAssignDailyTasks() {
+                if (!currentUser) return;
+                const today = new Date().toDateString();
+                const todayTasks = allTasks.filter(
+                    (t) =>
+                        t.userId === currentUser.id &&
+                        new Date(t.createdAt).toDateString() === today,
+                );
+                if (todayTasks.length === 0) {
+                    const shuffled = [...DAILY_TASKS_POOL];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                    }
+                    const selected = shuffled.slice(
+                        0,
+                        3 + Math.floor(Math.random() * 2),
+                    );
+                    for (let name of selected) {
+                        const newTask = {
+                            name,
+                            description: "Автоматическая директива дня",
+                            priority: 3,
+                            deadline: null,
+                            userId: currentUser.id,
+                            completed: false,
+                            createdAt: new Date().toISOString(),
+                        };
+                        await window.api.createTask(newTask);
+                    }
+                    await refreshAll();
+                }
+            }
+
+            function setScale(percent) {
+                document.getElementById("scale-container").style.zoom =
+                    percent / 100;
+                document.getElementById("scale-slider").value = percent;
+            }
+
+            function showAuth(showLogin) {
+                document.getElementById("login-box").style.display = showLogin
+                    ? "block"
+                    : "none";
+                document.getElementById("register-box").style.display =
+                    showLogin ? "none" : "block";
+                loginAttempts = 0;
+                if (blockInterval) clearInterval(blockInterval);
+                document.getElementById("login-btn").disabled = false;
+                document.getElementById("login-btn").innerText = "ВОЙТИ";
+                document.getElementById("login-error").innerText = "";
+                document.getElementById("reg-error").innerText = "";
+            }
+
+            async function register() {
+                const username = document
+                    .getElementById("reg-username")
+                    .value.trim();
+                const email = document.getElementById("reg-email").value.trim();
+                const password = document.getElementById("reg-password").value;
+                const confirm = document.getElementById("reg-confirm").value;
+                const rank =
+                    document.getElementById("reg-rank").value.trim() ||
+                    "Новобранец";
+                if (!username || !email || !password) {
+                    showRegError("Заполните все поля");
+                    return;
+                }
+                if (password !== confirm) {
+                    showRegError("Пароли не совпадают");
+                    return;
+                }
+                const res = await window.api.register({
+                    username,
+                    password,
+                    email,
+                    rank,
+                });
+                if (res.success) {
+                    const loginRes = await window.api.login({
+                        username,
+                        password,
+                    });
+                    if (loginRes.success) {
+                        currentUser = loginRes.user;
+                        document.getElementById(
+                            "auth-container",
+                        ).style.display = "none";
+                        document.getElementById("app-container").style.display =
+                            "flex";
+                        document.getElementById(
+                            "dashboard-username",
+                        ).innerText = currentUser.username.toUpperCase();
+                        document.getElementById("user-role-display").innerText =
+                            currentUser.role === "admin"
+                                ? "АДМИНИСТРАТОР"
+                                : "ГРАЖДАНИН";
+                        const useDark = currentUser.darkMode !== false;
+                        if (!useDark)
+                            document.body.classList.add("light-theme");
+                        else document.body.classList.remove("light-theme");
+                        document.getElementById("light-theme-toggle").checked =
+                            !useDark;
+                        await loadAllData();
+                        if (isMorning()) await autoAssignDailyTasks();
+                        renderDashboardTasks();
+                        renderTasksTable();
+                        if (currentUser.role === "admin") renderUsersTable();
+                        updateStats();
+                        updateNavigation();
+                        startGlobalDeadlineChecker();
+                        startNearestTaskTimer();
+                        switchTab("dashboard");
+                    } else {
+                        showStyledAlert(
+                            "ОШИБКА",
+                            "Регистрация успешна, но автоматический вход не удался. Попробуйте войти вручную.",
+                        );
+                        showAuth(true);
+                        document.getElementById("login-error").innerText =
+                            "Регистрация завершена, теперь войдите.";
+                        document.getElementById("login-username").value =
+                            username;
+                    }
+                } else {
+                    showRegError(res.message);
+                }
+            }
+
+            async function login() {
+                if (loginBlockedUntil && Date.now() < loginBlockedUntil) {
+                    const sec = Math.ceil(
+                        (loginBlockedUntil - Date.now()) / 1000,
+                    );
+                    document.getElementById("login-error").innerText =
+                        `Слишком много попыток. Подождите ${sec} секунд.`;
+                    return;
+                }
+                const username = document
+                    .getElementById("login-username")
+                    .value.trim();
+                const password =
+                    document.getElementById("login-password").value;
+                const res = await window.api.login({ username, password });
+                if (res.success) {
+                    loginAttempts = 0;
+                    currentUser = res.user;
+                    document.getElementById("auth-container").style.display =
+                        "none";
+                    document.getElementById("app-container").style.display =
+                        "flex";
+                    document.getElementById("dashboard-username").innerText =
+                        currentUser.username.toUpperCase();
+                    document.getElementById("user-role-display").innerText =
+                        currentUser.role === "admin"
+                            ? "АДМИНИСТРАТОР"
+                            : "ГРАЖДАНИН";
+                    const useDark = currentUser.darkMode !== false;
+                    if (!useDark) document.body.classList.add("light-theme");
+                    else document.body.classList.remove("light-theme");
+                    document.getElementById("light-theme-toggle").checked =
+                        !useDark;
+                    await loadAllData();
+                    if (isMorning()) await autoAssignDailyTasks();
+                    renderDashboardTasks();
+                    renderTasksTable();
+                    if (currentUser.role === "admin") renderUsersTable();
+                    updateStats();
+                    updateNavigation();
+                    startGlobalDeadlineChecker();
+                    startNearestTaskTimer();
+                    switchTab("dashboard");
+                } else {
+                    loginAttempts++;
+                    document.getElementById("login-error").innerText =
+                        res.message;
+                    if (loginAttempts >= 3) {
+                        loginBlockedUntil = Date.now() + 30000;
+                        document.getElementById("login-btn").disabled = true;
+                        document.getElementById("login-error").innerText =
+                            "3 неудачные попытки. Блокировка 30 секунд.";
+                        if (blockInterval) clearInterval(blockInterval);
+                        blockInterval = setInterval(() => {
+                            if (Date.now() >= loginBlockedUntil) {
+                                document.getElementById("login-btn").disabled =
+                                    false;
+                                document.getElementById(
+                                    "login-error",
+                                ).innerText = "";
+                                clearInterval(blockInterval);
+                                loginAttempts = 0;
+                                loginBlockedUntil = null;
+                            } else {
+                                const sec = Math.ceil(
+                                    (loginBlockedUntil - Date.now()) / 1000,
+                                );
+                                document.getElementById(
+                                    "login-error",
+                                ).innerText = `Блокировка: ${sec} сек.`;
+                            }
+                        }, 1000);
+                    }
+                }
+            }
+
+            async function loadAllData() {
+                allTasks = await window.api.getTasks();
+                if (currentUser.role === "admin")
+                    allUsers = await window.api.getUsers();
+                if (currentUser.role !== "admin")
+                    allTasks = allTasks.filter(
+                        (t) => t.userId === currentUser.id,
+                    );
+            }
+
+            async function refreshAll() {
+                await loadAllData();
+                renderDashboardTasks();
+                renderTasksTable();
+                if (currentUser.role === "admin") renderUsersTable();
+                updateStats();
+                startNearestTaskTimer();
+            }
+
+            function renderDashboardTasks() {
+                const container = document.getElementById("tasks-list");
+                container.innerHTML = "";
+                if (!allTasks.length) {
+                    container.innerHTML =
+                        "<div style='color: var(--text-dim); padding: 20px;'>Нет активных директив. Нажмите + Добавить задачу или запросите мотивацию.</div>";
+                    return;
+                }
+                allTasks.forEach((task, idx) => {
+                    const div = document.createElement("div");
+                    div.className = `task-item ${task.completed ? "checked" : ""}`;
+                    div.setAttribute("data-id", task.id);
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.className = "task-checkbox";
+                    checkbox.checked = task.completed;
+                    checkbox.onchange = (e) =>
+                        toggleTaskCompletion(task.id, e.target.checked);
+                    const textSpan = document.createElement("span");
+                    textSpan.className = "task-text";
+                    textSpan.innerText = `${idx + 1}. ${task.name}`;
+                    if (!task.completed) {
+                        textSpan.onclick = () =>
+                            startTaskFromDashboard(task.id);
+                    }
+                    const counterSpan = document.createElement("span");
+                    counterSpan.className = "task-status-counter";
+                    counterSpan.innerText = task.completed ? "(1/1)" : "(0/1)";
+                    div.appendChild(checkbox);
+                    div.appendChild(textSpan);
+                    div.appendChild(counterSpan);
+                    container.appendChild(div);
+                });
+                const total = allTasks.length,
+                    completed = allTasks.filter((t) => t.completed).length;
+                const percent = total
+                    ? Math.round((completed / total) * 100)
+                    : 0;
+                document.getElementById("efficiency-progress").style.width =
+                    `${percent}%`;
+                document.getElementById("efficiency-value").innerText =
+                    `${percent}%`;
+                const statusSpan = document.getElementById("user-status-text");
+                if (percent >= 80) {
+                    statusSpan.innerText = "ОБРАЗЦОВЫЙ ГРАЖДАНИН";
+                    statusSpan.style.color = "#00ff2b";
+                } else if (percent >= 50) {
+                    statusSpan.innerText = "В СТРОЮ";
+                    statusSpan.style.color = "var(--yellow-demo)";
+                } else {
+                    statusSpan.innerText = "ПОД НАБЛЮДЕНИЕМ";
+                    statusSpan.style.color = "#ff4545";
+                }
+            }
+
+            async function toggleTaskCompletion(taskId, completed) {
+                const task = allTasks.find((t) => t.id === taskId);
+                if (task && task.completed !== completed) {
+                    task.completed = completed;
+                    await window.api.updateTask(taskId, {
+                        name: task.name,
+                        description: task.description,
+                        priority: task.priority,
+                        deadline: task.deadline,
+                        completed,
+                        userId: task.userId,
+                    });
+                    await refreshAll();
+                    if (currentRunningTask === taskId && completed) {
+                        if (globalTimerInterval)
+                            clearInterval(globalTimerInterval);
+                        globalTimerInterval = null;
+                        currentRunningTask = null;
+                        timerSeconds = 2700;
+                        updateTimerDisplay();
+                    }
+                }
+            }
+
+            async function startTaskFromDashboard(taskId) {
+                const task = allTasks.find((t) => t.id === taskId);
+                if (!task) {
+                    showStyledAlert("ОШИБКА", "Задача не найдена!");
+                    return;
+                }
+                if (task.completed) {
+                    showStyledAlert("ВНИМАНИЕ", "Эта задача уже выполнена!");
+                    return;
+                }
+                let deadlineSeconds = 2700;
+                if (task.deadline) {
+                    const deadlineDate = new Date(task.deadline);
+                    const now = new Date();
+                    const diffSec = Math.floor((deadlineDate - now) / 1000);
+                    if (diffSec > 0) deadlineSeconds = diffSec;
+                    else {
+                        await deleteTaskSilent(taskId);
+                        showStyledAlert(
+                            "ПРОСРОЧКА",
+                            `Задача "${task.name}" просрочена и удалена.`,
+                        );
+                        await refreshAll();
+                        return;
+                    }
+                }
+                startGlobalTimer(task.id, task.name, deadlineSeconds);
+                switchTab("action");
+            }
+
+            async function deleteTaskSilent(taskId) {
+                await window.api.deleteTask(taskId);
+            }
+
+            function startGlobalTimer(taskId, taskName, seconds) {
+                if (globalTimerInterval) clearInterval(globalTimerInterval);
+                currentRunningTask = taskId;
+                timerSeconds = seconds;
+                document.getElementById("active-mission-title").innerText =
+                    `МИССИЯ: ${taskName.toUpperCase()}`;
+                updateTimerDisplay();
+                globalTimerInterval = setInterval(() => {
+                    if (currentRunningTask !== null) {
+                        timerSeconds--;
+                        updateTimerDisplay();
+                        simulateLogs();
+                        if (timerSeconds <= 0) {
+                            clearInterval(globalTimerInterval);
+                            globalTimerInterval = null;
+                            failTask();
+                        }
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                const mins = Math.floor(Math.max(0, timerSeconds) / 60)
+                    .toString()
+                    .padStart(2, "0");
+                const secs = (Math.max(0, timerSeconds) % 60)
+                    .toString()
+                    .padStart(2, "0");
+                const timerElement = document.getElementById("countdown-timer");
+                if (timerElement) timerElement.innerText = `${mins}:${secs}`;
+            }
+
+            function simulateLogs() {
+                const logs = [
+                    "Телеметрия стабильна. Фокус внимания зафиксирован...",
+                    "Анализ биометрии: пульс в норме.",
+                    "Синхронизация данных с Министерством Истины... Успешно.",
+                    "Внимание: не отводите взгляд от рабочей зоны терминала.",
+                ];
+                document.getElementById("tactical-log").innerText =
+                    `Лог: ${logs[Math.floor(Math.random() * logs.length)]}`;
+            }
+
+            async function completeTask() {
+                if (currentRunningTask) {
+                    await toggleTaskCompletion(currentRunningTask, true);
+                }
+                if (globalTimerInterval) clearInterval(globalTimerInterval);
+                globalTimerInterval = null;
+                currentRunningTask = null;
+                timerSeconds = 2700;
+                updateTimerDisplay();
+                startNearestTaskTimer();
+                switchTab("dashboard");
+            }
+
+            async function failTask() {
+                if (currentRunningTask) {
+                    const task = allTasks.find(
+                        (t) => t.id === currentRunningTask,
+                    );
+                    if (task && !task.completed) {
+                        await window.api.deleteTask(currentRunningTask);
+                        showStyledAlert(
+                            "ПРОВАЛ",
+                            `Задача "${task.name}" провалена! Офицер Демократии направлен для разъяснительной беседы.`,
+                        );
+                        await refreshAll();
+                    }
+                }
+                if (globalTimerInterval) clearInterval(globalTimerInterval);
+                globalTimerInterval = null;
+                currentRunningTask = null;
+                timerSeconds = 2700;
+                updateTimerDisplay();
+                startNearestTaskTimer();
+                switchTab("alarm");
+            }
+
+            function startNearestTaskTimer() {
+                if (globalTimerInterval) return; // не прерываем активный таймер
+                const now = new Date();
+                let nearestTask = null;
+                let nearestSeconds = Infinity;
+                for (let task of allTasks) {
+                    if (!task.completed && task.deadline) {
+                        const deadline = new Date(task.deadline);
+                        const diffSec = Math.floor((deadline - now) / 1000);
+                        if (diffSec > 0 && diffSec < nearestSeconds) {
+                            nearestSeconds = diffSec;
+                            nearestTask = task;
+                        }
+                    }
+                }
+                if (nearestTask) {
+                    startGlobalTimer(
+                        nearestTask.id,
+                        nearestTask.name,
+                        nearestSeconds,
+                    );
+                } else {
+                    if (globalTimerInterval) clearInterval(globalTimerInterval);
+                    globalTimerInterval = null;
+                    currentRunningTask = null;
+                    timerSeconds = 2700;
+                    updateTimerDisplay();
+                }
+            }
+
+            async function checkAllTasksDeadlines() {
+                if (!currentUser) return;
+                const now = new Date();
+                let expiredIds = [];
+                for (let task of allTasks) {
+                    if (!task.completed && task.deadline) {
+                        const deadline = new Date(task.deadline);
+                        if (deadline <= now) {
+                            expiredIds.push(task.id);
+                        }
+                    }
+                }
+                if (expiredIds.length) {
+                    for (let id of expiredIds) {
+                        await window.api.deleteTask(id);
+                    }
+                    showStyledAlert(
+                        "ПРОСРОЧКА",
+                        `Удалено ${expiredIds.length} просроченных задач. Офицер Демократии уведомлён.`,
+                    );
+                    await refreshAll();
+                    if (
+                        currentRunningTask &&
+                        expiredIds.includes(currentRunningTask)
+                    ) {
+                        if (globalTimerInterval)
+                            clearInterval(globalTimerInterval);
+                        globalTimerInterval = null;
+                        currentRunningTask = null;
+                        timerSeconds = 2700;
+                        updateTimerDisplay();
+                        switchTab("alarm");
+                    }
+                }
+            }
+
+            function startGlobalDeadlineChecker() {
+                if (deadlineCheckInterval) clearInterval(deadlineCheckInterval);
+                deadlineCheckInterval = setInterval(
+                    () => checkAllTasksDeadlines(),
+                    1000,
+                );
+            }
+
+            function renderTasksTable() {
+                const tbody = document.querySelector("#tasks-table tbody");
+                tbody.innerHTML = "";
+                const searchVal =
+                    document
+                        .getElementById("task-search")
+                        ?.value.toLowerCase() || "";
+                const filtered = allTasks.filter((item) =>
+                    item.name.toLowerCase().includes(searchVal),
+                );
+                const usersMap = allUsers.reduce((map, u) => {
+                    map[u.id] = u.username;
+                    return map;
+                }, {});
+                filtered.forEach((item) => {
+                    const row = tbody.insertRow();
+                    row.insertCell().innerText = item.name;
+                    row.insertCell().innerText = item.description || "";
+                    row.insertCell().innerText = item.priority || 1;
+                    row.insertCell().innerText = item.deadline
+                        ? new Date(item.deadline).toLocaleString()
+                        : "—";
+                    row.insertCell().innerText =
+                        usersMap[item.userId] || item.userId;
+                    const actionCell = row.insertCell();
+                    const editBtn = document.createElement("button");
+                    editBtn.innerText = "✎";
+                    editBtn.className = "btn-icon";
+                    editBtn.onclick = () => openEditModal("task", item.id);
+                    const delBtn = document.createElement("button");
+                    delBtn.innerText = "🗑";
+                    delBtn.className = "btn-icon";
+                    delBtn.onclick = () =>
+                        openDeleteModal("task", item.id, item.name);
+                    actionCell.appendChild(editBtn);
+                    actionCell.appendChild(delBtn);
+                });
+            }
+
+            function renderUsersTable() {
+                const tbody = document.querySelector("#users-table tbody");
+                tbody.innerHTML = "";
+                allUsers.forEach((user) => {
+                    const row = tbody.insertRow();
+                    row.insertCell().innerText = user.username;
+                    row.insertCell().innerText = user.email;
+                    row.insertCell().innerText = user.rank;
+                    row.insertCell().innerText =
+                        user.roleName === "admin"
+                            ? "АДМИНИСТРАТОР"
+                            : "ГРАЖДАНИН";
+                    const actionCell = row.insertCell();
+                    if (user.username !== "admin") {
+                        const roleSelect = document.createElement("select");
+                        roleSelect.innerHTML = `<option value="2" ${user.roleName !== "admin" ? "selected" : ""}>Гражданин</option><option value="1" ${user.roleName === "admin" ? "selected" : ""}>Администратор</option>`;
+                        roleSelect.onchange = async () => {
+                            const newRoleId = parseInt(roleSelect.value);
+                            await window.api.updateUserRole(user.id, newRoleId);
+                            refreshAll();
+                        };
+                        actionCell.appendChild(roleSelect);
+                        const delBtn = document.createElement("button");
+                        delBtn.innerText = "🗑";
+                        delBtn.className = "btn-icon";
+                        delBtn.onclick = () =>
+                            openDeleteModal("user", user.id, user.username);
+                        actionCell.appendChild(delBtn);
+                        const callBtn = document.createElement("button");
+                        callBtn.innerText = "📢";
+                        callBtn.className = "btn-icon";
+                        callBtn.title = "Вызвать Офицера Демократии";
+                        callBtn.onclick = () =>
+                            showStyledAlert(
+                                "ВЫЗОВ ОФИЦЕРА",
+                                `Офицер Демократии вызван к гражданину ${user.username}. Ему будет разъяснена важность выполнения директив!`,
+                            );
+                        actionCell.appendChild(callBtn);
+                    } else {
+                        actionCell.innerText = "Недоступно";
+                    }
+                });
+            }
+
+            async function openEditModal(entity, id) {
+                let item = allTasks.find((t) => t.id === id);
+                if (!item) return;
+                currentEditing = { entity, id, mode: "edit" };
+                let fieldsHtml = `<div class="form-group"><label>Название (мин.3)</label><input id="edit-name" value="${escapeHtml(item.name)}"></div>
+                          <div class="form-group"><label>Описание</label><textarea id="edit-desc">${escapeHtml(item.description || "")}</textarea></div>
+                          <div class="form-group"><label>Приоритет (1-5)</label><input id="edit-priority" type="number" value="${item.priority || 1}"></div>
+                          <div class="form-group"><label>Дедлайн (опционально)</label><input type="datetime-local" id="edit-deadline" value="${item.deadline ? item.deadline.slice(0, 16) : ""}"></div>`;
+                if (currentUser.role === "admin") {
+                    const usersOptions = allUsers
+                        .map(
+                            (u) =>
+                                `<option value="${u.id}" ${item.userId === u.id ? "selected" : ""}>${escapeHtml(u.username)}</option>`,
+                        )
+                        .join("");
+                    fieldsHtml += `<div class="form-group"><label>Пользователь</label><select id="edit-userId">${usersOptions}</select></div>`;
+                } else {
+                    fieldsHtml += `<input type="hidden" id="edit-userId" value="${currentUser.id}">`;
+                }
+                document.getElementById("modal-title").innerText =
+                    "РЕДАКТИРОВАТЬ ЗАДАЧУ";
+                document.getElementById("modal-body").innerHTML = fieldsHtml;
+                document.getElementById("entity-modal").classList.add("active");
+            }
+
+            function openDeleteModal(entity, id, name) {
+                let message = `Вы действительно хотите удалить запись "${name}"? Это действие нельзя отменить, и все ваши котики умрут от грусти.`;
+                if (entity === "user")
+                    message = `Вы уверены, что хотите удалить гражданина "${name}"? Это удалит все его задачи.`;
+                document.getElementById("confirm-text").innerHTML = message;
+                document
+                    .getElementById("confirm-modal")
+                    .classList.add("active");
+                pendingDelete = { entity, id };
+            }
+
+            function closeConfirmModal() {
+                document
+                    .getElementById("confirm-modal")
+                    .classList.remove("active");
+                pendingDelete = null;
+            }
+
+            async function saveEntity() {
+                const entity = currentEditing.entity;
+                let data = {};
+                if (entity === "task") {
+                    data.name = document
+                        .getElementById("edit-name")
+                        .value.trim();
+                    data.description =
+                        document.getElementById("edit-desc").value;
+                    data.priority =
+                        parseInt(
+                            document.getElementById("edit-priority").value,
+                        ) || 1;
+                    data.deadline = document.getElementById("edit-deadline")
+                        .value
+                        ? new Date(
+                              document.getElementById("edit-deadline").value,
+                          ).toISOString()
+                        : null;
+                    data.userId =
+                        currentUser.role === "admin"
+                            ? parseInt(
+                                  document.getElementById("edit-userId").value,
+                              )
+                            : currentUser.id;
+                    if (data.name.length < 3) {
+                        showStyledAlert(
+                            "ОШИБКА",
+                            "Название не менее 3 символов",
+                        );
+                        return;
+                    }
+                    data.completed = false;
+                    if (currentEditing.mode === "edit")
+                        await window.api.updateTask(currentEditing.id, data);
+                    else await window.api.createTask(data);
+                }
+                await refreshAll();
+                closeModal();
+            }
+
+            function openAddModal(entity) {
+                currentEditing = { entity, mode: "add" };
+                let fieldsHtml = `<div class="form-group"><label>Название (мин.3)</label><input id="edit-name"></div>
+                          <div class="form-group"><label>Описание</label><textarea id="edit-desc"></textarea></div>
+                          <div class="form-group"><label>Приоритет (1-5)</label><input id="edit-priority" type="number" value="1"></div>
+                          <div class="form-group"><label>Дедлайн (опционально)</label><input type="datetime-local" id="edit-deadline"></div>`;
+                if (currentUser.role === "admin") {
+                    const usersOptions = allUsers
+                        .map(
+                            (u) =>
+                                `<option value="${u.id}">${escapeHtml(u.username)}</option>`,
+                        )
+                        .join("");
+                    fieldsHtml += `<div class="form-group"><label>Пользователь</label><select id="edit-userId">${usersOptions}</select></div>`;
+                } else {
+                    fieldsHtml += `<input type="hidden" id="edit-userId" value="${currentUser.id}">`;
+                }
+                document.getElementById("modal-title").innerText =
+                    "СОЗДАНИЕ ЗАДАЧИ";
+                document.getElementById("modal-body").innerHTML = fieldsHtml;
+                document.getElementById("entity-modal").classList.add("active");
+            }
+
+            function closeModal() {
+                document
+                    .getElementById("entity-modal")
+                    .classList.remove("active");
+                currentEditing = null;
+            }
+
+            async function exportToCSV(entity, data) {
+                if (!data.length) {
+                    showStyledAlert("ЭКСПОРТ", "Нет данных для экспорта");
+                    return;
+                }
+                await window.api.exportCSV(entity, data);
+            }
+
+            function updateStats() {
+                const completed = allTasks.filter((t) => t.completed).length;
+                document.getElementById("stat-tasks-done").innerText =
+                    completed;
+                const prod = allTasks.length
+                    ? Math.round((completed / allTasks.length) * 100)
+                    : 0;
+                document.getElementById("stat-productivity").innerText =
+                    `${prod}%`;
+            }
+
+            function updateNavigation() {
+                const nav = document.getElementById("main-nav");
+                let tabs = ["dashboard", "tasks", "stats", "settings"];
+                if (currentUser?.role === "admin") tabs.splice(2, 0, "users");
+                const titles = {
+                    dashboard: "ГЛАВНЫЙ ЭКРАН",
+                    tasks: "ЗАДАЧИ",
+                    stats: "СТАТИСТИКА",
+                    users: "ПОЛЬЗОВАТЕЛИ",
+                    settings: "НАСТРОЙКИ",
+                };
+                nav.innerHTML = tabs
+                    .map(
+                        (tab) =>
+                            `<div class="nav-btn ${tab === "dashboard" ? "active" : ""}" data-tab="${tab}">[ ${titles[tab]} ]</div>`,
+                    )
+                    .join("");
+                document.querySelectorAll(".nav-btn").forEach((btn) => {
+                    btn.onclick = () => switchTab(btn.getAttribute("data-tab"));
+                });
+            }
+
+            function switchTab(tabId) {
+                document
+                    .querySelectorAll(".screen")
+                    .forEach((s) => s.classList.remove("active"));
+                const targetScreen = document.getElementById(`${tabId}-screen`);
+                if (targetScreen) targetScreen.classList.add("active");
+                document
+                    .querySelectorAll(".nav-btn")
+                    .forEach((btn) => btn.classList.remove("active"));
+                const btn = document.querySelector(
+                    `.nav-btn[data-tab="${tabId}"]`,
+                );
+                if (btn) btn.classList.add("active");
+                if (tabId === "tasks") renderTasksTable();
+                if (tabId === "stats") updateStats();
+                if (tabId === "users" && currentUser?.role === "admin")
+                    renderUsersTable();
+            }
+
+            async function setLightTheme(enabled) {
+                if (enabled) document.body.classList.add("light-theme");
+                else document.body.classList.remove("light-theme");
+                if (currentUser)
+                    await window.api.updateTheme(currentUser.id, !enabled);
+            }
+
+            function showLogoutConfirm() {
+                document.getElementById("confirm-text").innerHTML =
+                    "Вы уверены, что хотите выйти из системы?";
+                document
+                    .getElementById("confirm-modal")
+                    .classList.add("active");
+                pendingDelete = { entity: "logout" };
+            }
+
+            function logout() {
+                if (globalTimerInterval) clearInterval(globalTimerInterval);
+                if (deadlineCheckInterval) clearInterval(deadlineCheckInterval);
+                globalTimerInterval = null;
+                deadlineCheckInterval = null;
+                currentRunningTask = null;
+                timerSeconds = 2700;
+                currentUser = null;
+                document.getElementById("app-container").style.display = "none";
+                document.getElementById("auth-container").style.display =
+                    "flex";
+                document.getElementById("login-username").value = "";
+                document.getElementById("login-password").value = "";
+                loginAttempts = 0;
+                if (blockInterval) clearInterval(blockInterval);
+                document.getElementById("login-btn").disabled = false;
+                showAuth(true);
+                updateTimerDisplay();
+            }
+
+            function submitManualTask() {
+                const input = document.getElementById("task-raw-input");
+                const value = input.value.trim();
+                if (!value) return;
+                (async () => {
+                    const newTask = {
+                        name: value,
+                        description: "Добавлено вручную",
+                        priority: 3,
+                        deadline: null,
+                        userId: currentUser.id,
+                        completed: false,
+                        createdAt: new Date().toISOString(),
+                    };
+                    await window.api.createTask(newTask);
+                    await refreshAll();
+                    input.value = "";
+                    switchTab("dashboard");
+                })();
+            }
+
+            function requestHQTask() {
+                const randomTask =
+                    DAILY_TASKS_POOL[
+                        Math.floor(Math.random() * DAILY_TASKS_POOL.length)
+                    ];
+                (async () => {
+                    const newTask = {
+                        name: randomTask,
+                        description: "Задача из штаба",
+                        priority: 4,
+                        deadline: null,
+                        userId: currentUser.id,
+                        completed: false,
+                        createdAt: new Date().toISOString(),
+                    };
+                    await window.api.createTask(newTask);
+                    await refreshAll();
+                    switchTab("dashboard");
+                })();
+            }
+
+            async function showMotivationModal() {
+                document
+                    .getElementById("motivation-modal")
+                    .classList.add("active");
+            }
+            function closeMotivationModal() {
+                document
+                    .getElementById("motivation-modal")
+                    .classList.remove("active");
+            }
+            async function confirmMotivation() {
+                closeMotivationModal();
+                const randomTaskName =
+                    DAILY_TASKS_POOL[
+                        Math.floor(Math.random() * DAILY_TASKS_POOL.length)
+                    ];
+                const randomMinutes = Math.floor(Math.random() * 10) + 1;
+                const deadlineSeconds = randomMinutes * 60;
+                const deadlineDate = new Date(
+                    Date.now() + deadlineSeconds * 1000,
+                );
+                const newTask = {
+                    name: randomTaskName,
+                    description: "Экстренная мотивационная директива",
+                    priority: 5,
+                    deadline: deadlineDate.toISOString(),
+                    userId: currentUser.id,
+                    completed: false,
+                    createdAt: new Date().toISOString(),
+                };
+                await window.api.createTask(newTask);
+                await refreshAll();
+                startNearestTaskTimer();
+                switchTab("action");
+            }
+
+            function showRegError(msg) {
+                document.getElementById("reg-error").innerText = msg;
+            }
+            function escapeHtml(str) {
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === "&") return "&amp;";
+                    if (m === "<") return "&lt;";
+                    if (m === ">") return "&gt;";
+                    return m;
+                });
+            }
+
+            window.onload = () => {
+                document.getElementById("show-register").onclick = () =>
+                    showAuth(false);
+                document.getElementById("show-login").onclick = () =>
+                    showAuth(true);
+                document.getElementById("login-btn").onclick = login;
+                document.getElementById("register-btn").onclick = register;
+                document.getElementById("light-theme-toggle").onchange = (e) =>
+                    setLightTheme(e.target.checked);
+                document.getElementById("logout-btn").onclick =
+                    showLogoutConfirm;
+                document.getElementById("add-task-btn").onclick = () =>
+                    openAddModal("task");
+                document.getElementById("motivation-btn").onclick =
+                    showMotivationModal;
+                document.getElementById("complete-task-btn").onclick =
+                    completeTask;
+                document.getElementById("fail-task-btn").onclick = failTask;
+                document.getElementById("submit-manual-task").onclick =
+                    submitManualTask;
+                document.getElementById("request-hq-task").onclick =
+                    requestHQTask;
+                document.getElementById("modal-cancel").onclick = closeModal;
+                document.getElementById("modal-confirm").onclick = saveEntity;
+                document
+                    .getElementById("task-search")
+                    .addEventListener("input", () => renderTasksTable());
+                document.getElementById("export-tasks-btn").onclick = () =>
+                    exportToCSV("tasks", allTasks);
+                const scaleSlider = document.getElementById("scale-slider");
+                scaleSlider.addEventListener("input", (e) => {
+                    setScale(e.target.value);
+                    localStorage.setItem("uiScale", e.target.value);
+                });
+                const savedScale = localStorage.getItem("uiScale");
+                setScale(savedScale ? parseInt(savedScale) : 150);
+                document.getElementById("motivation-confirm").onclick =
+                    confirmMotivation;
+                document.getElementById("motivation-cancel").onclick =
+                    closeMotivationModal;
+                // Обработчик подтверждения удаления/выхода
+                document.getElementById("confirm-yes").onclick = async () => {
+                    if (pendingDelete) {
+                        if (pendingDelete.entity === "task") {
+                            await window.api.deleteTask(pendingDelete.id);
+                            await refreshAll();
+                        } else if (pendingDelete.entity === "user") {
+                            await window.api.deleteUser(pendingDelete.id);
+                            await refreshAll();
+                        } else if (pendingDelete.entity === "logout") {
+                            logout();
+                        }
+                        closeConfirmModal();
+                    }
+                };
+                document.getElementById("confirm-no").onclick = () =>
+                    closeConfirmModal();
+
+                showAuth(true);
+            };
+        </script>
+    </body>
+</html>

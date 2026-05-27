@@ -1,0 +1,41 @@
+{
+  "name": "democratic-app",
+  "version": "1.0.0",
+  "description": "Программа Братской Поддержки — система мотивации граждан Супер-Земли",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . 'Программа Братской Поддержки' --platform=linux --arch=x64 --out=dist --overwrite",
+    "dist": "electron-builder"
+  },
+  "keywords": [],
+  "author": "Super-Earth Ministry of Technology",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@electron/packager": "^20.0.0",
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.superearth.brotherhood",
+    "productName": "Программа Братской Поддержки",
+    "directories": {
+      "output": "release"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "pacman"
+      ],
+      "category": "Utility",
+      "icon": "icon.png"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/.cache",
+      "!*.log"
+    ],
+    "asar": false
+  }
+}
