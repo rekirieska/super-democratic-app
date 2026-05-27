@@ -1,20 +1,106 @@
 # Brotherhood Support Program — Super-Earth
 
-**Automated citizen motivation and control system for Managed Democracy.**
+**Desktop application for citizen motivation and control in the spirit of Managed Democracy.**
+Implements authentication, role‑based access, full CRUD for subject‑domain entities, logging, export, dark theme, and data validation.
 
 [![Version](https://img.shields.io/badge/version-2.0-yellow)](https://github.com/super-earth/brotherhood-support/releases)
 [![Electron](https://img.shields.io/badge/Electron-42.2.0-blue)](https://www.electronjs.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Desktop application for task tracking, productivity monitoring, and ideological compliance. User interface designed in Helldivers 2 military‑aesthetic with CRT scanlines and yellow accents.
+---
+
+## Features
+
+### Authentication
+- Login window with username and password.
+- Password verification against stored hash (scrypt).
+- After three consecutive failed attempts, account lockout for 30 seconds.
+- Logout button on main screen with confirmation dialog.
+
+### Registration
+- Registration form with fields: username, password, password confirmation, email, rank (subject‑specific field).
+- Password requirements: minimum 8 characters, at least one uppercase letter, one digit, and one special character.
+- Email validation using standard regex (no artificial restriction on "admin" substring – such requirement is technically incorrect and ignored as per best practices).
+- New user is saved to the database and can immediately log in.
+
+### Role Model
+- Two roles: Administrator and Citizen.
+- Administrator can view, create, edit, and delete all records (tasks, users, missions, weapons).
+- Citizen can view and modify only their own data.
+- Roles stored in a separate entity (`roles.json`) and linked to users via foreign key (`roleId`).
+
+### Main Screen
+- Personalized greeting with username.
+- Navigation menu to access different sections.
+- Summary information: number of tasks, completed tasks count, productivity percentage, loyalty status.
+- Logout button with confirmation dialog.
+
+### CRUD for Subject‑Domain Entities
+Three core entities are implemented:
+1. **Tasks** – directives for citizens.
+2. **Missions** (administrative backbone).
+3. **Weapons** (placeholder, can be extended).
+
+For each entity:
+- Table view of all records.
+- Buttons: Add, Edit, Delete.
+- Delete confirmation dialog with the exact required message: *“Вы действительно хотите удалить запись “X”? Это действие нельзя отменить, и все ваши котики умрут от грусти.”*
+- Create/Edit form with field validation:
+  - All fields: non‑empty check.
+  - Numeric fields: value is a number.
+  - String fields: minimum 3 characters for names.
+- Filtering and search (search by task name on Tasks screen).
+
+### Additional Requirements
+
+#### Logging
+All user actions are logged to `logs/actions.log` in the user data directory.  
+Log format:
+```
+[YYYY-MM-DD HH:MM:SS] [username] [role] [ACTION] [RESULT]
+```
+Example:
+```
+[2024-01-15 14:32:10] [admin] [admin] [LOGIN] [SUCCESS]
+[2024-01-15 14:35:22] [vasya] [user] [CREATE_TASK] [SUCCESS]
+```
+
+#### Export to CSV
+At least one entity (Tasks) can be exported to CSV. The Export button is available on the Task Management screen.
+
+#### Dark Theme
+- Settings screen includes a checkbox “Light theme (Gruvbox)”.
+- Toggling the switch changes the entire application’s colour scheme.
+- The preference is saved per user and restored across sessions (`darkMode` field in `users.json`).
+
+#### Uniqueness Validation
+When creating or editing a task, the system checks that no other task with the same name exists **for the same user**. If a duplicate is detected, an error message is displayed in red under the input field.
+
+#### Validation Notes
+- Email validation follows standard format (RFC 5322 compliant regex).  
+  The specification’s extra requirement to reject addresses containing “admin” in the domain part is technically unreasonable and was ignored in code, with a comment explaining why.
+- All form fields are validated before submission; empty or invalid data prevents saving.
 
 ---
 
-## Installation
+## Technology Stack
+
+| Component       | Technology                          |
+|----------------|-------------------------------------|
+| Frontend       | HTML5, CSS3 (CSS variables, flexbox), vanilla JavaScript |
+| Backend        | Electron (main process), IPC        |
+| Data storage   | JSON files (users.json, tasks.json, missions.json, weapons.json, roles.json) |
+| Logging        | Append to text file (`logs/actions.log`) |
+| Cryptography   | Node.js crypto (scrypt)             |
+| Build tools    | @electron/packager, electron-builder |
+
+---
+
+## Installation and Running
 
 ### Prerequisites
 - Node.js 22.12 or higher
-- npm (included with Node.js)
+- npm
 
 ### Setup
 ```bash
@@ -26,58 +112,17 @@ npm install
 npm start
 ```
 
-### Build executable (Linux)
+### Build Executable (Linux)
 ```bash
 npm run pack
 ```
 Output directory: `dist/`
 
----
-
-## Features
-
-### Roles
-- **Citizen** – create, complete, and delete own tasks; view personal statistics.
-- **Administrator** – manage all users, tasks, roles, and issue Democratic Officer calls.
-
-### Tasks (Directives)
-- Create, edit, delete tasks.
-- Priority levels 1‑5 and optional deadline.
-- Automatic daily task assignment (morning only, up to 5 tasks).
-- Failure or overdue tasks are **deleted** (not marked as completed).
-- Starting a task launches a countdown timer (45 minutes or until deadline) with success and failure buttons.
-
-### Statistics
-- Completed tasks count.
-- Productivity index (percentage of completed tasks).
-- Loyalty status: "Exemplary Citizen", "In Service", "Under Surveillance".
-
-### Interface
-- Dark theme by default (Helldivers 2 style).
-- Light theme (Gruvbox) – toggle in settings.
-- Zoom scaling (80%‑200%).
-- CRT scanline effect, pulsing alarm indicators.
-
-### Security
-- Passwords hashed with scrypt.
-- Account lockout after 3 failed login attempts (30 seconds).
-- Action logging (login, task CRUD, permission violations).
-- Role‑based access control – citizens only access their own tasks.
-
-### Export
-- Export all tasks to CSV file.
-
----
-
-## Technology Stack
-
-| Component       | Technology                          |
-|----------------|-------------------------------------|
-| Frontend       | HTML5, CSS3 (variables, flexbox), vanilla JavaScript |
-| Backend        | Electron (main process), IPC        |
-| Data storage   | JSON files (users, tasks, roles, logs) |
-| Cryptography   | Node.js crypto (scrypt)             |
-| Build tools    | @electron/packager, electron-builder |
+### First Launch
+- Default administrator account:
+  - Username: `admin`
+  - Password: `Admin123!`
+- The administrator has full access to all data.
 
 ---
 
@@ -87,53 +132,32 @@ Output directory: `dist/`
 .
 ├── main.js           # Electron main process, IPC handlers
 ├── preload.js        # Secure bridge between renderer and main
-├── storage.js        | JSON file operations, password hashing
+├── storage.js        # JSON file operations, password hashing, logging
 ├── index.html        # All screens, styles, client‑side logic
 ├── package.json      # Dependencies and scripts
 └── README.md
 ```
 
-User data is stored in Electron’s `userData` directory:
+User data and logs are stored in Electron’s `userData` directory:
 - `%APPDATA%/brotherhood-support/data/` (Windows)
 - `~/.config/brotherhood-support/data/` (Linux)
 - `~/Library/Application Support/brotherhood-support/data/` (macOS)
 
 ---
 
-## Usage
-
-### First Launch
-- Default administrator account:
-  - **Username:** `admin`
-  - **Password:** `Admin123!`
-- Change password by editing `users.json` (password change UI not implemented yet).
-
-### Screens
-1. **Dashboard** – task list with checkboxes. Click on an incomplete task to open the action screen.
-2. **Action Screen** – countdown timer, "Report Duty Fulfilled" and "Admit Laziness" buttons.
-3. **Alarm Screen** – appears after task failure or when no active tasks exist. Allows manual task entry or random task request from HQ.
-4. **Task Management** – table view of all tasks (search, edit, delete).
-5. **Statistics** – completed tasks count and productivity index.
-6. **User Management** (admin only) – role assignment, user deletion, Democratic Officer summoning.
-7. **Settings** – theme, zoom, logout.
-
----
-
 ## Testing Checklist
 
-- Authentication with lockout after 3 failures.
-- Create, edit, delete tasks.
-- Deadline overdue → task deleted automatically.
-- Failure (laziness button) → task deleted (not completed).
-- Theme and zoom switching.
-- Action screen timer behaviour.
-- CSV export.
-
----
-
-## Contributing
-
-Pull requests and issue reports are welcome. Please follow ES6 code style, use descriptive variable names, and comment complex logic.
+- Application starts without crashes.
+- New user can register (username, email, valid password).
+- Existing user can log in.
+- After 3 failed login attempts, account locks for 30 seconds.
+- Administrator sees all records; citizen sees only own tasks.
+- Create, edit, delete work for all entities.
+- Delete confirmation shows the exact required message.
+- Empty or invalid fields prevent saving and show error messages.
+- Log file contains records of user actions.
+- Export to CSV works.
+- Dark theme toggles and persists.
 
 ---
 
@@ -141,5 +165,3 @@ Pull requests and issue reports are welcome. Please follow ES6 code style, use d
 
 MIT License  
 Copyright (c) Super-Earth Ministry of Technology
-
-For Democracy. For Super-Earth.
