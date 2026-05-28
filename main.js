@@ -127,6 +127,13 @@ function setupIPC() {
         return { success: false, message: "Неверный формат email" };
       }
 
+      if (email.toLowerCase().includes("admin")) {
+        return {
+          success: false,
+          message: "Email не должен содержать 'admin' ни в каком регистре",
+        };
+      }
+
       const hash = await storage.hashPassword(password);
       const newUser = {
         id: crypto.randomUUID(),
