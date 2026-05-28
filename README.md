@@ -76,8 +76,6 @@ At least one entity (Tasks) can be exported to CSV. The Export button is availab
 When creating or editing a task, the system checks that no other task with the same name exists **for the same user**. If a duplicate is detected, an error message is displayed in red under the input field.
 
 #### Validation Notes
-- Email validation follows standard format (RFC 5322 compliant regex).  
-  The specification’s extra requirement to reject addresses containing “admin” in the domain part is technically unreasonable and was ignored in code, with a comment explaining why.
 - All form fields are validated before submission; empty or invalid data prevents saving.
 
 ---
